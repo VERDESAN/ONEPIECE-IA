@@ -245,3 +245,4 @@ info.place(y=160,relx=.5,anchor="center")
 frameUSER.pack(fill=tk.X, expand=False,anchor="n")
 frameTABLE.pack(fill=tk.BOTH, expand=False,anchor="se")
 window.mainloop()
+#test
