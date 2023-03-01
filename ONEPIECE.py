@@ -13,17 +13,17 @@ frameUSER = tk.Frame(master=window, width=150, height=200, bg="white")#FRAME PAR
 frameTABLE = tk.Frame(master=window, width=250, height=500, bg="black")
 #+-------------------------------------------+
 #LOAD DE IMAGENES USADAS
-imgluffy = Image.open("./luffy.png")
+imgluffy = Image.open("./IMAGENES/luffy.png")
 luffy = ImageTk.PhotoImage(imgluffy)
-imgchest = Image.open("./chest2.png")
+imgchest = Image.open("./IMAGENES/chest2.png")
 chest = ImageTk.PhotoImage(imgchest)
-imggrass = Image.open("./tierra.png")
+imggrass = Image.open("./IMAGENES/tierra.png")
 grass = ImageTk.PhotoImage(imggrass)
-imgwater = Image.open("./water.png")
+imgwater = Image.open("./IMAGENES/water.png")
 water = ImageTk.PhotoImage(imgwater)
-imgwall = Image.open("./bedrock.png")
+imgwall = Image.open("./IMAGENES/bedrock.png")
 wall = ImageTk.PhotoImage(imgwall)
-imgmagma = Image.open("./magma.png")
+imgmagma = Image.open("./IMAGENES/magma.png")
 magma = ImageTk.PhotoImage(imgmagma)
 
 #+-------------------------------------------+
@@ -245,4 +245,3 @@ info.place(y=160,relx=.5,anchor="center")
 frameUSER.pack(fill=tk.X, expand=False,anchor="n")
 frameTABLE.pack(fill=tk.BOTH, expand=False,anchor="se")
 window.mainloop()
-#test
