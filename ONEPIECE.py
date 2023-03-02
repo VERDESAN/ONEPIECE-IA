@@ -2,6 +2,7 @@ import tkinter as tk
 import random
 import numpy
 from PIL import ImageTk, Image
+import time
 
 #+-------------------------------------------+
 #GENERACION DE VENTANA Y 2 FRAMES PRINCIPALES
@@ -152,7 +153,7 @@ def piso():
 #METODO PARA BUSQUEDA DE CASILLA MAS ECONOMICA
 def busqueda():
     #[0]NORMAL,[1]PARED,[2]GATO,[3]RATON,[4]PASTO,[5]AGUA
-    costos=[1,50,4,0,3,4]
+    costos=[1,50,5,0,3,4]
     #P=D+H+C  | D ES DISTANCIA DE NODO | H CANTIDAD NODOS A OBJETIVO | C COSTO |
     #SACAR POSICION RATON Y GATO
     rv=[0,0]
@@ -160,17 +161,19 @@ def busqueda():
     for i in range(10):
         for j in range(10):
             if gridA[i][j] == 3:
-                rv[0]=i+1
-                rv[1]=j+1
+                rv[0]=i
+                rv[1]=j
             if gridA[i][j] == 2:
-                gb[0]=i+1
-                gb[1]=j+1
+                gb[0]=i
+                gb[1]=j
     print(gb,rv)
     #SACAR DISTANCIA INICIAL
     dini=(abs(gb[0]-rv[0])+abs(gb[1]-rv[1]))
     print(dini)
     dact=dini
-    listn=str(gb[0])+","+str(gb[1])
+    listn=[]
+    postxt=str(gb[0])+","+str(gb[1])
+    listn=[str(postxt)]
     while dact != 0:
         #CASO DE NO TENER, LIMPIAR
         dsup=99
@@ -178,63 +181,74 @@ def busqueda():
         dizq=99
         dder=99
         #VERFICAR ARRIBA
-        if gb[0] > 1:
+        print("#-----")
+        if gb[0] > 0:
             dsup=(abs(gb[0]-1-rv[0])+abs(gb[1]-rv[1]))
             dirsig=str(gb[0]-1)+","+str(gb[1])
-            print(dirsig)
+            print("SUPERIOR: ",dirsig)
             if dsup > dact:
-                dsup = dsup + 3
+                dsup = dsup + 4
             if dirsig in listn:
-                dsup = dsup + 3
-            costsig = gridA[gb[0]-2][gb[1]-1]
+                dsup = dsup + 5
+            costsig = gridA[gb[0]-1][gb[1]]
             dsup = costos[costsig] + dsup
         #VERIFICAR ABAJO
-        if gb[0] < 10:
+        if gb[0] < 9:
             dinf=(abs(gb[0]+1-rv[0])+abs(gb[1]-rv[1]))
             dirsig=str(gb[0]+1)+","+str(gb[1])
-            print(dirsig)
+            print("INFERIOR: ",dirsig)
             if dinf > dact:
-                dinf = dinf + 3
+                dinf = dinf + 4
             if dirsig in listn:
-                dinf =+3
-            costsig =  gridA[(gb[0])][gb[1]-1]
+                dinf = dinf + 5
+            costsig =  gridA[(gb[0]+1)][gb[1]]
             dinf = costos[costsig] + dinf
         #VERIFICAR IZQUIERDA
-        if gb[1] > 1:
+        if gb[1] > 0:
             dizq=(abs(gb[0]-rv[0])+abs(gb[1]-1-rv[1]))
             dirsig=str(gb[0])+","+str(gb[1]-1)
-            print(dirsig)
+            print("IZQUIERDA: ",dirsig)
             if dizq > dact:
-                dizq = dizq + 3
+                dizq = dizq + 4
             if dirsig in listn:
-                dizq =+3
-            costsig = gridA[gb[0]-1][gb[1]-2]
+                dizq = dizq + 5
+            costsig = gridA[gb[0]][gb[1]-1]
             dizq = costos[costsig] + dizq
         #VERIFICAR DERECHA
-        if gb[1] < 10:
+        if gb[1] < 9:
             dder=(abs(gb[0]-rv[0])+abs(gb[1]+1-rv[1]))
             dirsig=str(gb[0])+","+str(gb[1]+1)
-            print(dirsig)
+            print("DERECHA: ",dirsig)
             if dder > dact:
-                dder = dder + 3
+                dder = dder + 4
             if dirsig in listn:
-                dder =+3
-            costsig = gridA[gb[0]-1][(gb[1])]
+                dder = dder + 5
+            costsig = gridA[gb[0]][gb[1]+1]
             dder = costos[costsig] + dder
         print("superior: ",dsup," inferior: ",dinf," izquierda: ", dizq," derecha: ",dder)
+        #CLEAN DEL LUFFY
         label = tk.Label(master=frameGRID, width=58,height=62,image=grass, bg="#E3E3E3")
         label.grid(row=gb[0], column=gb[1], padx=2, pady=2)
-        gridA[(gb[0])][gb[1]]=0
+        gridA[gb[0]][gb[1]]=0
+        #CAMBIO DE POSICION
+        print("POSICION PRE MOV: ",gb[0],gb[1])
+        print("DISTANCIA PRE MOV: ",dact)
+        print("DIRECCION DEL MOV: ")
         gb[0],gb[1] = costover(dsup,dinf,dizq,dder,gb[0],gb[1])
         label = tk.Label(master=frameGRID, width=58,height=62,image=luffy, bg="#E3E3E3")
         label.grid(row=gb[0], column=gb[1], padx=2, pady=2)
         gridA[(gb[0])][gb[1]]=2
+        postxt=str(gb[0])+","+str(gb[1])
+        listn.append(postxt)
+        print(listn)
         #CHECK COSTOS
-        print(dact)
-        print("a: ",gb[0],gb[1])
+        #window.after(850)
+        #frameGRID.after(800)
         dact=(abs(gb[0]-rv[0])+abs(gb[1]-rv[1]))
-        print("b: ",gb[0],gb[1])
-        print(dact)
+        print("POSICION POST MOV: ",gb[0],gb[1])
+        print("DISTANCIA POST MOV: ",dact)
+        #time.time(50)
+        
         
 
 def costover(dsup,dinf,dizq,dder,gb,gb2):
@@ -246,13 +260,48 @@ def costover(dsup,dinf,dizq,dder,gb,gb2):
     if dder < min_num:
         min_num = dder
 
+    #SELECTOR ALEATORIO DE A DONDE MOVERSE
+    sel=random.randint(0,1)
+    if dsup == min_num:
+        if dsup == dinf:
+            if sel:
+                print("dsupinf")
+                return(gb+1,gb2)
+        if dsup == dizq:
+            if sel:
+                print("dsupizq")
+                return(gb,gb2-1) 
+        if dsup == dder:
+            if sel:
+                print("dsupdder")
+                return(gb,gb2+1)
+    if dinf == min_num:
+        if dinf == dizq:
+            if sel:
+                print("dinfizq")
+                return(gb,gb2-1) 
+        if dinf == dder:
+            if sel:
+                print("dinfdder")
+                return(gb,gb2+1)
+    if dizq == min_num:
+        if dizq == dder:
+            if sel:
+                print("dizqdder")
+                return(gb,gb2+1)
+    print("SELFALT")
+    #SELECTOR FALTANTE
     if min_num == dsup:
+        print("SUP")
         return(gb-1,gb2)
     elif min_num == dinf:
+        print("INF")
         return(gb+1,gb2)
     elif min_num == dizq:
+        print("IZQ")
         return(gb,gb2-1)    
     else:
+        print("DER")
         return(gb,gb2+1)
 #+-------------------------------------------+
 #BOTONES
@@ -266,7 +315,7 @@ mover=tk.Button(master=frameUSER, text="MOVER", command=busqueda, bd=0, bg="whit
 mover.place(y=75,relx=.5,anchor="center")
 limpiar=tk.Button(master=frameUSER, text="LIMPIAR", command=clean, bd=0, bg="white")
 limpiar.place(y=105,relx=.5,anchor="center")
-info=tk.Label(master=frameUSER,text="COSTOS\nTIERRA=1\nMAGMA=3\nAGUA=4\nBACKWRD=+3",bg="white",fg="grey")
+info=tk.Label(master=frameUSER,text="COSTOS\nTIERRA=1\nMAGMA=3\nAGUA=4\nBACKWRD=+4",bg="white",fg="grey")
 info.place(y=160,relx=.5,anchor="center")
 frameUSER.pack(fill=tk.X, expand=False,anchor="n")
 frameTABLE.pack(fill=tk.BOTH, expand=False,anchor="se")
