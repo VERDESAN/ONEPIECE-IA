@@ -153,7 +153,7 @@ def piso():
 #METODO PARA BUSQUEDA DE CASILLA MAS ECONOMICA
 def busqueda():
     #[0]NORMAL,[1]PARED,[2]GATO,[3]RATON,[4]PASTO,[5]AGUA
-    costos=[1,50,5,0,3,4]
+    costos=[1,50,5,0,3,5]
     #P=D+H+C  | D ES DISTANCIA DE NODO | H CANTIDAD NODOS A OBJETIVO | C COSTO |
     #SACAR POSICION RATON Y GATO
     rv=[0,0]
@@ -189,7 +189,8 @@ def busqueda():
             if dsup > dact:
                 dsup = dsup + 4
             if dirsig in listn:
-                dsup = dsup + 5
+                aux = listn.count(dirsig)
+                dsup = dsup + 5 * aux
             costsig = gridA[gb[0]-1][gb[1]]
             dsup = costos[costsig] + dsup
         #VERIFICAR ABAJO
@@ -200,7 +201,8 @@ def busqueda():
             if dinf > dact:
                 dinf = dinf + 4
             if dirsig in listn:
-                dinf = dinf + 5
+                aux = listn.count(dirsig)
+                dinf = dinf + 5 * aux
             costsig =  gridA[(gb[0]+1)][gb[1]]
             dinf = costos[costsig] + dinf
         #VERIFICAR IZQUIERDA
@@ -211,7 +213,8 @@ def busqueda():
             if dizq > dact:
                 dizq = dizq + 4
             if dirsig in listn:
-                dizq = dizq + 5
+                aux = listn.count(dirsig)
+                dizq = dizq + 5 * aux
             costsig = gridA[gb[0]][gb[1]-1]
             dizq = costos[costsig] + dizq
         #VERIFICAR DERECHA
@@ -222,34 +225,47 @@ def busqueda():
             if dder > dact:
                 dder = dder + 4
             if dirsig in listn:
-                dder = dder + 5
+                aux = listn.count(dirsig)
+                
+                dder = dder + 5 * aux
             costsig = gridA[gb[0]][gb[1]+1]
             dder = costos[costsig] + dder
         print("superior: ",dsup," inferior: ",dinf," izquierda: ", dizq," derecha: ",dder)
+
         #CLEAN DEL LUFFY
-        label = tk.Label(master=frameGRID, width=58,height=62,image=grass, bg="#E3E3E3")
-        label.grid(row=gb[0], column=gb[1], padx=2, pady=2)
-        gridA[gb[0]][gb[1]]=0
+        remap(gb[0],gb[1],gridA[gb[0]][gb[1]])
+
         #CAMBIO DE POSICION
         print("POSICION PRE MOV: ",gb[0],gb[1])
         print("DISTANCIA PRE MOV: ",dact)
         print("DIRECCION DEL MOV: ")
         gb[0],gb[1] = costover(dsup,dinf,dizq,dder,gb[0],gb[1])
-        label = tk.Label(master=frameGRID, width=58,height=62,image=luffy, bg="#E3E3E3")
-        label.grid(row=gb[0], column=gb[1], padx=2, pady=2)
-        gridA[(gb[0])][gb[1]]=2
+
+        #SALVADO POSICION ANTERIOR EN LISTA CERRADA
         postxt=str(gb[0])+","+str(gb[1])
         listn.append(postxt)
         print(listn)
-        #CHECK COSTOS
-        #window.after(850)
+        
+        #REPRINT DE LUFFY EN NUEVA POSICION
+        window.after(900,remap(gb[0],gb[1],gridA[gb[0]][gb[1]]))
+        window.update()
         #frameGRID.after(800)
         dact=(abs(gb[0]-rv[0])+abs(gb[1]-rv[1]))
         print("POSICION POST MOV: ",gb[0],gb[1])
         print("DISTANCIA POST MOV: ",dact)
+        if dact == 0:
+            print("GANASTE")
         #time.time(50)
         
-        
+def remap(gb,gb2,elemento):
+    if elemento == 2:
+        label = tk.Label(master=frameGRID, width=58,height=62,image=grass, bg="#E3E3E3")
+        label.grid(row=gb, column=gb2, padx=2, pady=2)
+        gridA[gb][gb2] = 0
+    else:
+        label = tk.Label(master=frameGRID, width=58,height=62,image=luffy, bg="#E3E3E3")
+        label.grid(row=gb, column=gb2, padx=2, pady=2)
+        gridA[gb][gb2]=2
 
 def costover(dsup,dinf,dizq,dder,gb,gb2):
     min_num = dsup
