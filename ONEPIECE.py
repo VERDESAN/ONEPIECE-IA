@@ -152,7 +152,7 @@ def piso():
 #METODO PARA BUSQUEDA DE CASILLA MAS ECONOMICA
 def busqueda():
     #[0]NORMAL,[1]PARED,[2]GATO,[3]RATON,[4]PASTO,[5]AGUA
-    costos=[1,50,0,0,3,4]
+    costos=[1,50,4,0,3,4]
     #P=D+H+C  | D ES DISTANCIA DE NODO | H CANTIDAD NODOS A OBJETIVO | C COSTO |
     #SACAR POSICION RATON Y GATO
     rv=[0,0]
@@ -222,12 +222,38 @@ def busqueda():
             costsig = gridA[gb[0]-1][(gb[1])]
             dder = costos[costsig] + dder
         print("superior: ",dsup," inferior: ",dinf," izquierda: ", dizq," derecha: ",dder)
-
+        label = tk.Label(master=frameGRID, width=58,height=62,image=grass, bg="#E3E3E3")
+        label.grid(row=gb[0], column=gb[1], padx=2, pady=2)
+        gridA[(gb[0])][gb[1]]=0
+        gb[0],gb[1] = costover(dsup,dinf,dizq,dder,gb[0],gb[1])
+        label = tk.Label(master=frameGRID, width=58,height=62,image=luffy, bg="#E3E3E3")
+        label.grid(row=gb[0], column=gb[1], padx=2, pady=2)
+        gridA[(gb[0])][gb[1]]=2
         #CHECK COSTOS
-
-        dact=0
-
+        print(dact)
+        print("a: ",gb[0],gb[1])
+        dact=(abs(gb[0]-rv[0])+abs(gb[1]-rv[1]))
+        print("b: ",gb[0],gb[1])
+        print(dact)
         
+
+def costover(dsup,dinf,dizq,dder,gb,gb2):
+    min_num = dsup
+    if dinf < min_num:
+        min_num = dinf
+    if dizq < min_num:
+        min_num = dizq
+    if dder < min_num:
+        min_num = dder
+
+    if min_num == dsup:
+        return(gb-1,gb2)
+    elif min_num == dinf:
+        return(gb+1,gb2)
+    elif min_num == dizq:
+        return(gb,gb2-1)    
+    else:
+        return(gb,gb2+1)
 #+-------------------------------------------+
 #BOTONES
 generar=tk.Button(master=frameUSER, text="GENERAR", command=gen, bd=0, bg="white")
