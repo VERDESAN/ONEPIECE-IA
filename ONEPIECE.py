@@ -3,6 +3,7 @@ import random
 import numpy
 from PIL import ImageTk, Image
 import time
+from tkinter import ttk
 
 #+-------------------------------------------+
 #GENERACION DE VENTANA Y 2 FRAMES PRINCIPALES
@@ -10,8 +11,8 @@ window = tk.Tk()
 window.title("JOSE LUIS VERDE")
 window.resizable(width=False, height=False)
 frameGRID = tk.Frame(master=window, width=80, height=40, bg="white")  #FRAME PARA VISUALIZACION DEL GRID
-frameUSER = tk.Frame(master=window, width=150, height=200, bg="white")#FRAME PARA VISUALIZACION DE BOTONES
-frameTABLE = tk.Frame(master=window, width=250, height=500, bg="black")
+frameUSER = tk.Frame(master=window, width=150, height=140, bg="white")#FRAME PARA VISUALIZACION DE BOTONES
+frameTABLE = tk.Frame(master=window, width=900, height=900, bg="black")
 #+-------------------------------------------+
 #LOAD DE IMAGENES USADAS
 imgluffy = Image.open("./IMAGENES/luffy.png")
@@ -234,7 +235,9 @@ def busqueda():
 
         #CLEAN DEL LUFFY
         remap(gb[0],gb[1],gridA[gb[0]][gb[1]])
-
+        #-tabla
+        datos.insert(parent='',index='end',text='',
+        values=((gb[0],',',gb[1]),(rv[0],',',rv[1]),dact,dsup,dinf,dizq,dder))
         #CAMBIO DE POSICION
         print("POSICION PRE MOV: ",gb[0],gb[1])
         print("DISTANCIA PRE MOV: ",dact)
@@ -320,6 +323,29 @@ def costover(dsup,dinf,dizq,dder,gb,gb2):
         print("DER")
         return(gb,gb2+1)
 #+-------------------------------------------+
+#TABLA
+datos = ttk.Treeview(frameTABLE)
+datos['columns']=('POSICION ACTUAL','POSICION META','DISTANCIA','COSTO ↑', 'COSTO ↓','COSTO ←','COSTO →','SELECCION')
+datos.column('#0',width=0)
+datos.column('POSICION ACTUAL',anchor="center",width=120)
+datos.column('POSICION META',anchor="center",width=105)
+datos.column('DISTANCIA',anchor="center",width=75)
+datos.column('COSTO ↑',anchor="center",width=65)
+datos.column('COSTO ↓',anchor="center",width=65)
+datos.column('COSTO ←',anchor="center",width=65)
+datos.column('COSTO →',anchor="center",width=65)
+datos.column('SELECCION',anchor="center",width=105)
+#-
+datos.heading("#0",text="",anchor="center")
+datos.heading("POSICION ACTUAL",text="POSICION ACTUAL",anchor="center")
+datos.heading("POSICION META",text="POSICION META",anchor="center")
+datos.heading("DISTANCIA",text="DISTANCIA",anchor="center")
+datos.heading("COSTO ↑",text="COSTO ↑",anchor="center")
+datos.heading("COSTO ↓",text="COSTO ↓",anchor="center")
+datos.heading("COSTO ←",text="COSTO ←",anchor="center")
+datos.heading("COSTO →",text="COSTO →",anchor="center")
+datos.heading("SELECCION",text="SELECCION",anchor="center")
+datos.pack()
 #BOTONES
 generar=tk.Button(master=frameUSER, text="GENERAR", command=gen, bd=0, bg="white")
 generar.place(y=15,relx=.5,anchor="center")
@@ -332,7 +358,7 @@ mover.place(y=75,relx=.5,anchor="center")
 limpiar=tk.Button(master=frameUSER, text="LIMPIAR", command=clean, bd=0, bg="white")
 limpiar.place(y=105,relx=.5,anchor="center")
 info=tk.Label(master=frameUSER,text="COSTOS\nTIERRA=1\nMAGMA=3\nAGUA=4\nBACKWRD=+4",bg="white",fg="grey")
-info.place(y=160,relx=.5,anchor="center")
+info.place(y=60,relx=.8,anchor="center")
 frameUSER.pack(fill=tk.X, expand=False,anchor="n")
 frameTABLE.pack(fill=tk.BOTH, expand=False,anchor="se")
 window.mainloop()
