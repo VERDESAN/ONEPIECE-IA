@@ -52,6 +52,7 @@ gridA=[[0,0,0,0,0,0,0,0,0,0],
 #+-------------------------------------------+
 #METODO GENERADOR DE BLOQUES NEGROS PARA FORMAR UN CAMINO
 def gen():
+    datos.delete(*datos.get_children())
     for i in range(10):
         for j in range(10):
             if numpy.random.choice([0,1,0,0,0,0,0,0,0,0]) == 1:         #SE HACE 1/10 PARA DECIDIR SI SE INVIERTE EL 0 A 1
@@ -89,6 +90,7 @@ def gen():
 #VERIFICA SI ESTA LIBRE. SE MANDA AL GRID PRINCIPAL 2 PARA GATO Y 3 PARA RATON.
 def iniciar():
     #CLEAN DE ANTERIOR GATO RATON Y POR DEFECTO TERRENOS.
+    datos.delete(*datos.get_children())
     for i in range(10):
         for j in range(10):
             if gridA[i][j]==1:            
@@ -153,6 +155,7 @@ def piso():
 #+-------------------------------------------+
 #METODO PARA BUSQUEDA DE CASILLA MAS ECONOMICA
 def busqueda():
+    control=1
     #[0]NORMAL,[1]PARED,[2]GATO,[3]RATON,[4]PASTO,[5]AGUA
     costos=[1,50,5,0,3,5]
     #P=D+H+C  | D ES DISTANCIA DE NODO | H CANTIDAD NODOS A OBJETIVO | C COSTO |
@@ -237,13 +240,13 @@ def busqueda():
         remap(gb[0],gb[1],gridA[gb[0]][gb[1]])
         #-tabla
         datos.insert(parent='',index='end',text='',
-        values=((gb[0],',',gb[1]),(rv[0],',',rv[1]),dact,dsup,dinf,dizq,dder))
+        values=(control,(gb[0],',',gb[1]),(rv[0],',',rv[1]),dact,dsup,dinf,dizq,dder))
         #CAMBIO DE POSICION
         print("POSICION PRE MOV: ",gb[0],gb[1])
         print("DISTANCIA PRE MOV: ",dact)
         print("DIRECCION DEL MOV: ")
         gb[0],gb[1] = costover(dsup,dinf,dizq,dder,gb[0],gb[1])
-
+        control=control+1
         #SALVADO POSICION ANTERIOR EN LISTA CERRADA
         postxt=str(gb[0])+","+str(gb[1])
         listn.append(postxt)
@@ -325,8 +328,9 @@ def costover(dsup,dinf,dizq,dder,gb,gb2):
 #+-------------------------------------------+
 #TABLA
 datos = ttk.Treeview(frameTABLE)
-datos['columns']=('POSICION ACTUAL','POSICION META','DISTANCIA','COSTO ↑', 'COSTO ↓','COSTO ←','COSTO →','SELECCION')
+datos['columns']=('ID','POSICION ACTUAL','POSICION META','DISTANCIA','COSTO ↑', 'COSTO ↓','COSTO ←','COSTO →','SELECCION')
 datos.column('#0',width=0)
+datos.column('ID',anchor="center",width=10)
 datos.column('POSICION ACTUAL',anchor="center",width=120)
 datos.column('POSICION META',anchor="center",width=105)
 datos.column('DISTANCIA',anchor="center",width=75)
@@ -337,6 +341,7 @@ datos.column('COSTO →',anchor="center",width=65)
 datos.column('SELECCION',anchor="center",width=105)
 #-
 datos.heading("#0",text="",anchor="center")
+datos.heading("ID",text="ID",anchor="center")
 datos.heading("POSICION ACTUAL",text="POSICION ACTUAL",anchor="center")
 datos.heading("POSICION META",text="POSICION META",anchor="center")
 datos.heading("DISTANCIA",text="DISTANCIA",anchor="center")
@@ -345,7 +350,11 @@ datos.heading("COSTO ↓",text="COSTO ↓",anchor="center")
 datos.heading("COSTO ←",text="COSTO ←",anchor="center")
 datos.heading("COSTO →",text="COSTO →",anchor="center")
 datos.heading("SELECCION",text="SELECCION",anchor="center")
-datos.pack()
+scrollbar = ttk.Scrollbar(master=frameTABLE, orient=tk.VERTICAL, command=datos.yview)
+datos.config(yscrollcommand=scrollbar.set)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+#datos.configure(yscrollcommand=)
+datos.pack(fill='both',expand=True)
 #BOTONES
 generar=tk.Button(master=frameUSER, text="GENERAR", command=gen, bd=0, bg="white")
 generar.place(y=15,relx=.5,anchor="center")
@@ -360,5 +369,6 @@ limpiar.place(y=105,relx=.5,anchor="center")
 info=tk.Label(master=frameUSER,text="COSTOS\nTIERRA=1\nMAGMA=3\nAGUA=4\nBACKWRD=+4",bg="white",fg="grey")
 info.place(y=60,relx=.8,anchor="center")
 frameUSER.pack(fill=tk.X, expand=False,anchor="n")
-frameTABLE.pack(fill=tk.BOTH, expand=False,anchor="se")
+frameTABLE.pack(fill=tk.Y, expand=True,anchor="se")
+#scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 window.mainloop()
