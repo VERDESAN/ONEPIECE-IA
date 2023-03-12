@@ -2,13 +2,12 @@ import tkinter as tk
 import random
 import numpy
 from PIL import ImageTk, Image
-import time
-from tkinter import ttk
-
+from tkinter import ttk 
+from tkinter import messagebox as mb
 #+-------------------------------------------+
 #GENERACION DE VENTANA Y 2 FRAMES PRINCIPALES
 window = tk.Tk()
-window.title("JOSE LUIS VERDE")
+window.title("ONE PIECE - IA")
 window.resizable(width=False, height=False)
 frameGRID = tk.Frame(master=window, width=80, height=40, bg="white")  #FRAME PARA VISUALIZACION DEL GRID
 frameUSER = tk.Frame(master=window, width=150, height=140, bg="white")#FRAME PARA VISUALIZACION DE BOTONES
@@ -156,8 +155,8 @@ def piso():
 #METODO PARA BUSQUEDA DE CASILLA MAS ECONOMICA
 def busqueda():
     control=1
-    #[0]NORMAL,[1]PARED,[2]GATO,[3]RATON,[4]PASTO,[5]AGUA
-    costos=[1,50,5,0,3,5]
+    #[0]NORMAL,[1]PARED,[2]GATO,[3]RATON,[4]MAGMA,[5]AGUA
+    costos=[1,90,5,0,3,5]
     #P=D+H+C  | D ES DISTANCIA DE NODO | H CANTIDAD NODOS A OBJETIVO | C COSTO |
     #SACAR POSICION RATON Y GATO
     rv=[0,0]
@@ -194,6 +193,7 @@ def busqueda():
                 dsup = dsup + 4
             if dirsig in listn:
                 aux = listn.count(dirsig)
+                aux = aux+1
                 dsup = dsup + 5 * aux
             costsig = gridA[gb[0]-1][gb[1]]
             dsup = costos[costsig] + dsup
@@ -206,6 +206,7 @@ def busqueda():
                 dinf = dinf + 4
             if dirsig in listn:
                 aux = listn.count(dirsig)
+                aux = aux+1
                 dinf = dinf + 5 * aux
             costsig =  gridA[(gb[0]+1)][gb[1]]
             dinf = costos[costsig] + dinf
@@ -218,6 +219,7 @@ def busqueda():
                 dizq = dizq + 4
             if dirsig in listn:
                 aux = listn.count(dirsig)
+                aux = aux+1
                 dizq = dizq + 5 * aux
             costsig = gridA[gb[0]][gb[1]-1]
             dizq = costos[costsig] + dizq
@@ -230,7 +232,7 @@ def busqueda():
                 dder = dder + 4
             if dirsig in listn:
                 aux = listn.count(dirsig)
-                
+                aux = aux+1
                 dder = dder + 5 * aux
             costsig = gridA[gb[0]][gb[1]+1]
             dder = costos[costsig] + dder
@@ -240,12 +242,13 @@ def busqueda():
         remap(gb[0],gb[1],gridA[gb[0]][gb[1]])
         #-tabla
         datos.insert(parent='',index='end',text='',
-        values=(control,(gb[0],',',gb[1]),(rv[0],',',rv[1]),dact,dsup,dinf,dizq,dder))
+        values=(control,(gb[0],',',gb[1]),(rv[0],',',rv[1]),dact,dsup,dinf,dizq,dder,))
         #CAMBIO DE POSICION
         print("POSICION PRE MOV: ",gb[0],gb[1])
         print("DISTANCIA PRE MOV: ",dact)
         print("DIRECCION DEL MOV: ")
         gb[0],gb[1] = costover(dsup,dinf,dizq,dder,gb[0],gb[1])
+        #VARIABLE DE ID
         control=control+1
         #SALVADO POSICION ANTERIOR EN LISTA CERRADA
         postxt=str(gb[0])+","+str(gb[1])
@@ -259,10 +262,15 @@ def busqueda():
         dact=(abs(gb[0]-rv[0])+abs(gb[1]-rv[1]))
         print("POSICION POST MOV: ",gb[0],gb[1])
         print("DISTANCIA POST MOV: ",dact)
+        if control > 40:
+            mb.showerror("ERROR!", "NO HAY SOLUCION PARA ESTE MAPA.")
+            break
         if dact == 0:
-            print("GANASTE")
+            mb.showinfo("Información", "GANASTE!")
+            print("FINALIZADO")
         #time.time(50)
-        
+
+#RE PRINT CUADRO POR MOVIMIENTO        
 def remap(gb,gb2,elemento):
     if elemento == 2:
         label = tk.Label(master=frameGRID, width=58,height=62,image=grass, bg="#E3E3E3")
@@ -273,6 +281,7 @@ def remap(gb,gb2,elemento):
         label.grid(row=gb, column=gb2, padx=2, pady=2)
         gridA[gb][gb2]=2
 
+#SELECTOR DE MOVIMIENTO
 def costover(dsup,dinf,dizq,dder,gb,gb2):
     min_num = dsup
     if dinf < min_num:
@@ -281,7 +290,6 @@ def costover(dsup,dinf,dizq,dder,gb,gb2):
         min_num = dizq
     if dder < min_num:
         min_num = dder
-
     #SELECTOR ALEATORIO DE A DONDE MOVERSE
     sel=random.randint(0,1)
     if dsup == min_num:
@@ -328,7 +336,7 @@ def costover(dsup,dinf,dizq,dder,gb,gb2):
 #+-------------------------------------------+
 #TABLA
 datos = ttk.Treeview(frameTABLE)
-datos['columns']=('ID','POSICION ACTUAL','POSICION META','DISTANCIA','COSTO ↑', 'COSTO ↓','COSTO ←','COSTO →','SELECCION')
+datos['columns']=('ID','POSICION ACTUAL','POSICION META','DISTANCIA','COSTO ↑', 'COSTO ↓','COSTO ←','COSTO →')
 datos.column('#0',width=0)
 datos.column('ID',anchor="center",width=10)
 datos.column('POSICION ACTUAL',anchor="center",width=120)
@@ -337,8 +345,7 @@ datos.column('DISTANCIA',anchor="center",width=75)
 datos.column('COSTO ↑',anchor="center",width=65)
 datos.column('COSTO ↓',anchor="center",width=65)
 datos.column('COSTO ←',anchor="center",width=65)
-datos.column('COSTO →',anchor="center",width=65)
-datos.column('SELECCION',anchor="center",width=105)
+datos.column('COSTO →',anchor="center",width=105)
 #-
 datos.heading("#0",text="",anchor="center")
 datos.heading("ID",text="ID",anchor="center")
@@ -349,12 +356,12 @@ datos.heading("COSTO ↑",text="COSTO ↑",anchor="center")
 datos.heading("COSTO ↓",text="COSTO ↓",anchor="center")
 datos.heading("COSTO ←",text="COSTO ←",anchor="center")
 datos.heading("COSTO →",text="COSTO →",anchor="center")
-datos.heading("SELECCION",text="SELECCION",anchor="center")
 scrollbar = ttk.Scrollbar(master=frameTABLE, orient=tk.VERTICAL, command=datos.yview)
 datos.config(yscrollcommand=scrollbar.set)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 #datos.configure(yscrollcommand=)
 datos.pack(fill='both',expand=True)
+
 #BOTONES
 generar=tk.Button(master=frameUSER, text="GENERAR", command=gen, bd=0, bg="white")
 generar.place(y=15,relx=.5,anchor="center")
@@ -366,7 +373,7 @@ mover=tk.Button(master=frameUSER, text="MOVER", command=busqueda, bd=0, bg="whit
 mover.place(y=75,relx=.5,anchor="center")
 limpiar=tk.Button(master=frameUSER, text="LIMPIAR", command=clean, bd=0, bg="white")
 limpiar.place(y=105,relx=.5,anchor="center")
-info=tk.Label(master=frameUSER,text="COSTOS\nTIERRA=1\nMAGMA=3\nAGUA=4\nBACKWRD=+4",bg="white",fg="grey")
+info=tk.Label(master=frameUSER,text="COSTOS\nTIERRA=1\nMAGMA=3\nAGUA=5\nBACKWRD=+5*i",bg="white",fg="grey")
 info.place(y=60,relx=.8,anchor="center")
 frameUSER.pack(fill=tk.X, expand=False,anchor="n")
 frameTABLE.pack(fill=tk.Y, expand=True,anchor="se")
